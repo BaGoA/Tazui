@@ -16,8 +16,29 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-mod calculator;
+use std::collections::HashMap;
 
-fn main() {
-    println!("Hello World!");
+/// Process the string given by user
+pub struct Calculator {
+    variables: HashMap<String, f64>,
+}
+
+impl Calculator {
+    /// Create a calculator
+    pub fn new() -> Self {
+        return Calculator {
+            variables: HashMap::with_capacity(100),
+        };
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_calculator_new() {
+        let calc: Calculator = Calculator::new();
+        assert!(calc.variables.capacity() > 0)
+    }
 }
