@@ -16,10 +16,10 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-mod application;
-mod calculator;
-mod ui;
-
-fn main() {
-    println!("Hello World!");
+/// Trait to define terminal user interface functionnalities
+/// that Marvin application needs.
+pub trait Tui {
+    fn new() -> Self;
+    fn get_expression(&self, history: &Vec<String>) -> String;
+    fn display_string(&self, string: &String);
 }
