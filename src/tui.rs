@@ -16,15 +16,10 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-mod application;
-mod calculator;
-mod stdio_tui;
-mod tui;
-
-use application::Application;
-use stdio_tui::StdIoTui;
-
-fn main() {
-    let mut app: Application<StdIoTui> = Application::<StdIoTui>::new();
-    app.run();
+/// Trait to define terminal user interface functionnalities
+/// that Marvin application needs.
+pub trait Tui {
+    fn new() -> Self;
+    fn get_expression(&mut self, history: &Vec<String>) -> Result<String, String>;
+    fn display_string(&mut self, string: &String);
 }
