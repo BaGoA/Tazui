@@ -18,8 +18,13 @@
 
 mod application;
 mod calculator;
-mod ui;
+mod stdio_tui;
+mod tui;
+
+use application::Application;
+use stdio_tui::StdIoTui;
 
 fn main() {
-    println!("Hello World!");
+    let mut app: Application<StdIoTui> = Application::<StdIoTui>::new();
+    app.run();
 }

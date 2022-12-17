@@ -16,24 +16,23 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use super::ui::Tui;
+use super::tui::Tui;
 use super::calculator::Calculator;
 
 /// Taz calculator application
-pub struct Application<UIApp>
-where
-    UIApp: Tui,
+pub struct Application<TuiApp>
+where TuiApp: Tui,
 {
-    ui: UIApp,
+    tui: TuiApp,
     calculator : Calculator,
     history: Vec<String>,
 }
 
-impl<UIApp: Tui> Application<UIApp> {
+impl<TuiApp: Tui> Application<TuiApp> {
     /// Create a application
     pub fn new() -> Self {
         return Application {
-            ui: UIApp::new(),
+            tui: TuiApp::new(),
             calculator: Calculator::new(),
             history: Vec::with_capacity(5),
         };
@@ -44,15 +43,22 @@ impl<UIApp: Tui> Application<UIApp> {
         let header: String = 
             String::from("Marvin Copyright (C) 2022 Bastian Gonzalez Acevedo\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.\nThis is free software, and you are welcome to redistribute it under certain conditions; type `show c' for details.\n\n");
 
-        self.ui.display_string(&header);
+        self.tui.display_string(&header);
 
         let start_expression: String = String::from(">>> ");
         
         loop {
-            self.ui.display_string(&start_expression);
+            self.tui.display_string(&start_expression);
 
-            let expression: String = self.ui.get_expression(&self.history);
-
+            let collected_expression : Result<String, String> = self.tui.get_expression(&self.history);
+            
+            if collected_expression.is_err() {
+                self.tui.display_string(&collected_expression.err().unwrap());
+                break;
+            }
+            
+            let expression : String = String::from(collected_expression.unwrap().trim_matches('\n'));
+            
             if expression == String::from("quit") {
                 break;
             }
@@ -60,17 +66,13 @@ impl<UIApp: Tui> Application<UIApp> {
             if expression.len() == 0 {
                 continue;
             }
-            
-            match self.calculator.process(&expression) {
-                Ok((name, value)) => {
-                    let str_result: String = format!("{} = {}", name, value);
-                    self.ui.display_string(&str_result);
-                }
-                Err(message) => self.ui.display_string(&message)
-            }
+    
+            let str_result: String = match self.calculator.process(&expression) {
+                Ok((name, value)) => format!("{} = {}\n", name, value),
+                Err(message) => format!("{}\n", message)
+            };
 
-            self.ui.display_string(&String::from('\n'));
-
+            self.tui.display_string(&str_result);
             self.history.push(expression);
         }
     }

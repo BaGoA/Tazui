@@ -20,6 +20,6 @@
 /// that Marvin application needs.
 pub trait Tui {
     fn new() -> Self;
-    fn get_expression(&self, history: &Vec<String>) -> String;
-    fn display_string(&self, string: &String);
+    fn get_expression(&mut self, history: &Vec<String>) -> Result<String, String>;
+    fn display_string(&mut self, string: &String);
 }
