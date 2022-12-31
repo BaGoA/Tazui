@@ -16,49 +16,65 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use super::tui::Tui;
 use super::calculator::Calculator;
+use super::tui::Tui;
 
 /// Taz calculator application
 pub struct Application<TuiApp>
-where TuiApp: Tui,
+where
+    TuiApp: Tui + Default,
 {
     tui: TuiApp,
-    calculator : Calculator,
+    calculator: Calculator,
     history: Vec<String>,
 }
 
-impl<TuiApp: Tui> Application<TuiApp> {
+impl<TuiApp: Tui + Default> Application<TuiApp> {
     /// Create a application
     pub fn new() -> Self {
         return Application {
-            tui: TuiApp::new(),
+            tui: TuiApp::default(),
             calculator: Calculator::new(),
             history: Vec::with_capacity(5),
         };
     }
 
+    /// Initialization of application
+    /// We initialize TUI and write application copyright
+    pub fn init(&mut self) -> Result<(), String> {
+        self.tui.init()?;
+
+        self.tui.display_text_with_new_line(&String::from(
+            "Marvin Copyright (C) 2022 Bastian Gonzalez Acevedo",
+        ))?;
+
+        self.tui.display_text_with_new_line(&String::from(
+            "This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.",
+        ))?;
+
+        self.tui.display_text_with_new_line(&String::from("This is free software, and you are welcome to redistribute it under certain conditions; type `show c' for details."))?;
+
+        return Ok(());
+    }
+
     /// Run the application
-    pub fn run(&mut self) {
-        let header: String = 
-            String::from("Marvin Copyright (C) 2022 Bastian Gonzalez Acevedo\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.\nThis is free software, and you are welcome to redistribute it under certain conditions; type `show c' for details.\n\n");
-
-        self.tui.display_string(&header);
-
+    pub fn run(&mut self) -> Result<(), String> {
         let start_expression: String = String::from(">>> ");
-        
-        loop {
-            self.tui.display_string(&start_expression);
 
-            let collected_expression : Result<String, String> = self.tui.get_expression(&self.history);
-            
-            if collected_expression.is_err() {
-                self.tui.display_string(&collected_expression.err().unwrap());
-                break;
+        loop {
+            self.tui.display_text(&start_expression)?;
+
+            let expression: Result<String, String> = self.tui.get_expression(&self.history);
+
+            if expression.is_err() {
+                self.tui
+                    .display_text_with_new_line(&expression.err().unwrap())?;
+
+                continue;
             }
-            
-            let expression : String = String::from(collected_expression.unwrap().trim_matches('\n'));
-            
+
+            let expression: String = expression.ok().unwrap();
+
             if expression == String::from("quit") {
                 break;
             }
@@ -66,14 +82,19 @@ impl<TuiApp: Tui> Application<TuiApp> {
             if expression.len() == 0 {
                 continue;
             }
-    
-            let str_result: String = match self.calculator.process(&expression) {
-                Ok((name, value)) => format!("{} = {}\n", name, value),
-                Err(message) => format!("{}\n", message)
-            };
 
-            self.tui.display_string(&str_result);
-            self.history.push(expression);
+            match self.calculator.process(&expression) {
+                Ok((name, value)) => {
+                    self.history.push(expression);
+                    self.tui
+                        .display_text_with_new_line(&format!("{} = {}", name, value))?;
+                }
+                Err(message) => {
+                    self.tui.display_text_with_new_line(&message)?;
+                }
+            };
         }
+
+        return Ok(());
     }
 }

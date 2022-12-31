@@ -18,13 +18,23 @@
 
 mod application;
 mod calculator;
-mod stdio_tui;
+mod crossterm_tui;
 mod tui;
 
 use application::Application;
-use stdio_tui::StdIoTui;
+use crossterm_tui::CrosstermTui;
 
 fn main() {
-    let mut app: Application<StdIoTui> = Application::<StdIoTui>::new();
-    app.run();
+    let mut app: Application<CrosstermTui> = Application::<CrosstermTui>::new();
+
+    match app.init() {
+        Ok(()) => {
+            let run_result: Result<(), String> = app.run();
+
+            if run_result.is_err() {
+                println!("{}", run_result.err().unwrap());
+            }
+        }
+        Err(message) => println!("{}\n", message),
+    }
 }
