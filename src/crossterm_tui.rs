@@ -20,7 +20,7 @@ use super::tui::Tui;
 use std::io::{stdout, Error, Stdout, Write};
 
 use crossterm::{
-    cursor::{MoveRight, MoveTo, MoveToColumn, MoveToNextLine},
+    cursor::{MoveLeft, MoveRight, MoveTo, MoveToColumn, MoveToNextLine},
     event::{read, Event, KeyCode, KeyEvent},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
@@ -85,12 +85,54 @@ impl Tui for CrosstermTui {
                     self.stream.flush()?;
 
                     let new_cursor_column: usize = pos + self.start_of_line.len();
-
                     execute!(self.stream, MoveToColumn(new_cursor_column as u16))?;
+                }
+                KeyCode::Left => {
+                    if pos > 0 {
+                        pos -= 1;
+                        execute!(self.stream, MoveLeft(1))?;
+                    }
+                }
+                KeyCode::Right => {
+                    if pos < expression.len() {
+                        pos += 1;
+                        execute!(self.stream, MoveRight(1))?;
+                    }
+                }
+                KeyCode::Backspace => {
+                    if pos > 0 {
+                        pos -= 1;
+                        expression.remove(pos);
+
+                        // Reset current line with updated expression and cursor position
+                        execute!(self.stream, Clear(ClearType::CurrentLine), MoveToColumn(0))?;
+
+                        write!(self.stream, "{}{}", self.start_of_line, expression)?;
+                        self.stream.flush()?;
+
+                        let new_cursor_column: usize = pos + self.start_of_line.len();
+                        execute!(self.stream, MoveToColumn(new_cursor_column as u16))?;
+                    }
+                }
+                KeyCode::Up => {
+                    if let Some(last_expression) = history_iter.next() {
+                        expression = last_expression.clone();
+                        pos = expression.len();
+
+                        // Reset current line with updated expression and cursor position
+                        execute!(self.stream, Clear(ClearType::CurrentLine), MoveToColumn(0))?;
+
+                        write!(self.stream, "{}{}", self.start_of_line, expression)?;
+                        self.stream.flush()?;
+
+                        let new_cursor_column: usize = pos + self.start_of_line.len();
+                        execute!(self.stream, MoveToColumn(new_cursor_column as u16))?;
+                    }
                 }
                 KeyCode::Esc => {
                     expression = String::from("quit");
                     execute!(self.stream, MoveToNextLine(1))?;
+
                     break;
                 }
                 KeyCode::Enter => {
