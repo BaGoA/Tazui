@@ -27,14 +27,12 @@ use crossterm_tui::CrosstermTui;
 fn main() {
     let mut app: Application<CrosstermTui> = Application::<CrosstermTui>::new();
 
-    match app.init() {
-        Ok(()) => {
-            let run_result: Result<(), String> = app.run();
+    if let Err(error) = app.init() {
+        println!("{}\n", error);
+    }
 
-            if run_result.is_err() {
-                println!("{}", run_result.err().unwrap());
-            }
-        }
-        Err(message) => println!("{}\n", message),
+    match app.run() {
+        Ok(()) => (),
+        Err(error) => println!("{}\n", error),
     }
 }

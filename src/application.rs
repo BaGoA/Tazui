@@ -19,6 +19,8 @@
 use super::calculator::Calculator;
 use super::tui::Tui;
 
+use std::io::Error;
+
 /// Taz calculator application
 pub struct Application<TuiApp>
 where
@@ -41,7 +43,7 @@ impl<TuiApp: Tui + Default> Application<TuiApp> {
 
     /// Initialization of application
     /// We initialize TUI and write application copyright
-    pub fn init(&mut self) -> Result<(), String> {
+    pub fn init(&mut self) -> Result<(), Error> {
         self.tui.init()?;
 
         self.tui.display_text_with_new_line(&String::from(
@@ -58,22 +60,11 @@ impl<TuiApp: Tui + Default> Application<TuiApp> {
     }
 
     /// Run the application
-    pub fn run(&mut self) -> Result<(), String> {
-        let start_expression: String = String::from(">>> ");
-
+    pub fn run(&mut self) -> Result<(), Error> {
         loop {
-            self.tui.display_text(&start_expression)?;
+            self.tui.display_text(&self.tui.get_start_of_line())?;
 
-            let expression: Result<String, String> = self.tui.get_expression(&self.history);
-
-            if expression.is_err() {
-                self.tui
-                    .display_text_with_new_line(&expression.err().unwrap())?;
-
-                continue;
-            }
-
-            let expression: String = expression.ok().unwrap();
+            let expression: String = self.tui.get_expression(&self.history)?;
 
             if expression == String::from("quit") {
                 break;

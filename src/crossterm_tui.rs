@@ -17,21 +17,26 @@
 */
 
 use super::tui::Tui;
-use std::io::{stdout, Stdout, Write};
+use std::io::{stdout, Error, Stdout, Write};
 
 use crossterm::{
-    cursor::{MoveTo, MoveToNextLine},
+    cursor::{MoveRight, MoveTo, MoveToColumn, MoveToNextLine},
+    event::{read, Event, KeyCode, KeyEvent},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
 };
 
 pub struct CrosstermTui {
     stream: Stdout,
+    pub start_of_line: String,
 }
 
 impl Default for CrosstermTui {
     fn default() -> Self {
-        return CrosstermTui { stream: stdout() };
+        return CrosstermTui {
+            stream: stdout(),
+            start_of_line: String::from(">>> "),
+        };
     }
 }
 
@@ -45,37 +50,72 @@ impl Drop for CrosstermTui {
 }
 
 impl Tui for CrosstermTui {
-    fn init(&mut self) -> Result<(), String> {
-        if let Err(error) = enable_raw_mode() {
-            return Err(error.to_string());
-        }
+    fn init(&mut self) -> Result<(), Error> {
+        enable_raw_mode()?;
+        execute!(self.stream, Clear(ClearType::All), MoveTo(0, 0))?;
 
-        match execute!(self.stream, Clear(ClearType::All), MoveTo(0, 0)) {
-            Ok(()) => return Ok(()),
-            Err(error) => return Err(error.to_string()),
-        }
+        return Ok(());
     }
 
-    fn get_expression(&mut self, history: &Vec<String>) -> Result<String, String> {
-        //let mut expression: String = String::with_capacity(256);
-        return Ok(String::from("quit"));
+    fn get_start_of_line(&self) -> String {
+        return self.start_of_line.clone();
     }
 
-    fn display_text(&mut self, text: &String) -> Result<(), String> {
-        match write!(self.stream, "{}", text) {
-            Ok(()) => return Ok(()),
-            Err(error) => return Err(error.to_string()),
+    fn get_expression(&mut self, history: &Vec<String>) -> Result<String, Error> {
+        let mut expression: String = String::with_capacity(256);
+        let mut history_iter = history.iter().rev(); // browse history from the end
+
+        let mut pos: usize = 0;
+
+        while let Ok(Event::Key(KeyEvent { code, .. })) = read() {
+            match code {
+                KeyCode::Char(c) => {
+                    if pos == expression.len() {
+                        expression.push(c);
+                    } else {
+                        expression.insert(pos, c);
+                    }
+
+                    pos += 1;
+
+                    // Reset current line with updated expression and cursor position
+                    execute!(self.stream, Clear(ClearType::CurrentLine), MoveToColumn(0))?;
+
+                    write!(self.stream, "{}{}", self.start_of_line, expression)?;
+                    self.stream.flush()?;
+
+                    let new_cursor_column: usize = pos + self.start_of_line.len();
+
+                    execute!(self.stream, MoveToColumn(new_cursor_column as u16))?;
+                }
+                KeyCode::Esc => {
+                    expression = String::from("quit");
+                    execute!(self.stream, MoveToNextLine(1))?;
+                    break;
+                }
+                KeyCode::Enter => {
+                    execute!(self.stream, MoveToNextLine(1))?;
+                    break;
+                }
+                _ => continue,
+            }
         }
+
+        return Ok(expression);
     }
 
-    fn display_text_with_new_line(&mut self, text: &String) -> Result<(), String> {
-        if let Err(error) = write!(self.stream, "{}", text) {
-            return Err(error.to_string());
-        }
+    fn display_text(&mut self, text: &String) -> Result<(), Error> {
+        write!(self.stream, "{}", text)?;
+        self.stream.flush()?;
 
-        match execute!(self.stream, MoveToNextLine(1)) {
-            Ok(()) => return Ok(()),
-            Err(error) => return Err(error.to_string()),
-        }
+        return Ok(());
+    }
+
+    fn display_text_with_new_line(&mut self, text: &String) -> Result<(), Error> {
+        write!(self.stream, "{}", text)?;
+        execute!(self.stream, MoveToNextLine(1))?;
+        self.stream.flush()?;
+
+        return Ok(());
     }
 }
