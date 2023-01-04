@@ -6,4 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-taz = {git = "https://github.com/BaGoA/Taz", branch = "main"}
+taz = {git = "https://github.com/BaGoA/Taz"}
+crossterm = {git = "https://github.com/crossterm-rs/crossterm.git"}

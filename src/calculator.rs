@@ -20,7 +20,7 @@ use std::collections::HashMap;
 
 /// Process the string given by user
 pub struct Calculator {
-    variables: HashMap<String, f64>,
+    variables: HashMap<String, f64>, // map to store variable name associated to its value
 }
 
 impl Calculator {
@@ -31,7 +31,7 @@ impl Calculator {
         };
     }
 
-    /// Process expression given in argument.
+    /// Process expression given in argument. This expression can use variable declared before.
     /// We return a pair (String, f64) which correspond to name of variable and its value.
     /// In case we have a raw expression, the name of variable is "last"
     /// If error occurs we return a string containing error message.
