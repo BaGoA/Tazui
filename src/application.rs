@@ -26,9 +26,9 @@ pub struct Application<TuiApp>
 where
     TuiApp: Tui + Default,
 {
-    tui: TuiApp,
-    calculator: Calculator,
-    history: Vec<String>,
+    tui: TuiApp,            // terminal user interface to interact with user
+    calculator: Calculator, // calculator to process expressions given by user
+    history: Vec<String>,   // store previous expressions enter by user
 }
 
 impl<TuiApp: Tui + Default> Application<TuiApp> {
@@ -62,6 +62,7 @@ impl<TuiApp: Tui + Default> Application<TuiApp> {
     /// Run the application
     pub fn run(&mut self) -> Result<(), Error> {
         loop {
+            // Get expression given by user
             self.tui.display_text(&self.tui.get_start_of_line())?;
 
             let expression: String = self.tui.get_expression(&self.history)?;
@@ -74,6 +75,7 @@ impl<TuiApp: Tui + Default> Application<TuiApp> {
                 continue;
             }
 
+            // Process and display the result of expression
             match self.calculator.process(&expression) {
                 Ok((name, value)) => {
                     self.history.push(expression);
