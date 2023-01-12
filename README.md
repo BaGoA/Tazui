@@ -26,6 +26,8 @@ Then we have following view
 
 ![](doc/marvin-start.png)
 
+To quit Marvin application, we can write *quit* or use *ESC* key.
+
 Examples of usage:
 
 ![](doc/marvin-simple-usage.png)
