@@ -28,7 +28,10 @@ Then we have following view
 
 To quit Marvin application, we can write *quit* or use *ESC* key.
 
-Examples of usage:
+Marvin can work with simple expression and return result in variable named *last*. This can be reused in other expression.
+Moreover, we can define variable with an expression. Marvin evaluate it and put result in this variable. Then we can reuse these variables in other expression.
+
+Here are some examples:
 
 ![](doc/marvin-simple-usage.png)
 
