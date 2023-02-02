@@ -1,10 +1,10 @@
 [package]
-name = "marvin"
+name = "tazui"
 version = "0.1.0"
 edition = "2021"
 license-file = "LICENSE.md"
-description = "Marvin is a terminal calculator"
-repository = "https://github.com/BaGoA/Marvin"
+description = "Tazui is a terminal calculator"
+repository = "https://github.com/BaGoA/Tazui"
 readme = "README.md"
 keywords = ["calculator", "terminal"]
 

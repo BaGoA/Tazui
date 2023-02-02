@@ -1,5 +1,5 @@
 /*
-   Marvin is simple terminal calculator
+   Tazui is simple terminal calculator
    Copyright (C) 2022  Bastian Gonzalez Acevedo
 
    This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 */
 
 /// Trait to define terminal user interface functionnalities
-/// that Marvin application needs.
+/// that Tazui application needs.
 pub trait Tui {
     fn init(&mut self) -> Result<(), std::io::Error>;
     fn get_start_of_line(&self) -> String;

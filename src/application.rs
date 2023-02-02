@@ -1,5 +1,5 @@
 /*
-   Marvin is simple terminal calculator
+   Tazui is simple terminal calculator
    Copyright (C) 2022  Bastian Gonzalez Acevedo
 
    This program is free software: you can redistribute it and/or modify
@@ -47,7 +47,7 @@ impl<TuiApp: Tui + Default> Application<TuiApp> {
         self.tui.init()?;
 
         self.tui.display_text_with_new_line(&String::from(
-            "Marvin Copyright (C) 2022 Bastian Gonzalez Acevedo",
+            "Tazui Copyright (C) 2022 Bastian Gonzalez Acevedo",
         ))?;
 
         self.tui.display_text_with_new_line(&String::from(

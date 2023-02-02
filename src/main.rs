@@ -1,5 +1,5 @@
 /*
-   Marvin is simple terminal calculator
+   Tazui is simple terminal calculator
    Copyright (C) 2022  Bastian Gonzalez Acevedo
 
    This program is free software: you can redistribute it and/or modify
