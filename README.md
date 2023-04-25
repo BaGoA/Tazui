@@ -29,13 +29,9 @@ Then we have following view
 To quit Tazui application, we can write *quit* or use *ESC* key.
 
 Tazui can work with simple expression and return result in variable named *last*. This can be reused in other expression.
-Moreover, we can define variable with an expression. Tazui evaluate it and put result in this variable. Then we can reuse these variables in other expression.
-
-Here are some examples:
 
 ![](doc/tazui-simple-usage.png)
 
-![](doc/tazui-use-variables.png)
+Moreover, we can define variable with an expression. Tazui evaluate it and put result in this variable. Then we can reuse these variables in other expression.
 
-## Licensing
-Tazui library is free software, you can redistribute it and/or modify it under the terms of the GNU General Public License.
+![](doc/tazui-use-variables.png)

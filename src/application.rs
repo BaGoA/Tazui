@@ -1,27 +1,9 @@
-/*
-   Tazui is simple terminal calculator
-   Copyright (C) 2022  Bastian Gonzalez Acevedo
-
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-
 use super::calculator::Calculator;
 use super::tui::Tui;
 
 use std::io::Error;
 
-/// Taz calculator application
+/// Tazui calculator application
 pub struct Application<TuiApp>
 where
     TuiApp: Tui + Default,
@@ -46,15 +28,8 @@ impl<TuiApp: Tui + Default> Application<TuiApp> {
     pub fn init(&mut self) -> Result<(), Error> {
         self.tui.init()?;
 
-        self.tui.display_text_with_new_line(&String::from(
-            "Tazui Copyright (C) 2022 Bastian Gonzalez Acevedo",
-        ))?;
-
-        self.tui.display_text_with_new_line(&String::from(
-            "This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.",
-        ))?;
-
-        self.tui.display_text_with_new_line(&String::from("This is free software, and you are welcome to redistribute it under certain conditions; type `show c' for details."))?;
+        self.tui
+            .display_text_with_new_line(&String::from("Tazui Calculator"))?;
 
         return Ok(());
     }

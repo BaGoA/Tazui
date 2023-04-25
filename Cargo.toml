@@ -12,4 +12,4 @@ keywords = ["calculator", "terminal"]
 
 [dependencies]
 taz = "0.1.0"
-crossterm = "0.26.0"
+crossterm = "0.26.1"
