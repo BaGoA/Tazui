@@ -19,7 +19,7 @@ impl Calculator {
     /// We return a pair (String, f64) which correspond to name of variable and its value.
     /// In case we have a raw expression, the name of variable is "last"
     /// If error occurs we return a string containing error message.
-    pub fn process(&mut self, expression: &String) -> Result<(String, f64), String> {
+    pub fn process(&mut self, expression: &String) -> Result<(String, String), String> {
         match expression.find('=') {
             Some(index) => {
                 // Here we define a variable according to following format variable_name = variable_expression
@@ -32,7 +32,7 @@ impl Calculator {
 
                 self.variables.insert(name.clone(), value);
 
-                return Ok((name, value));
+                return Ok((name, value.to_string()));
             }
             None => {
                 // Here we have raw expression
@@ -41,7 +41,7 @@ impl Calculator {
 
                 self.variables.insert(name.clone(), value);
 
-                return Ok((name, value));
+                return Ok((name, value.to_string()));
             }
         }
     }
@@ -73,7 +73,7 @@ mod tests {
         match calc.process(&expression) {
             Ok((name, value)) => {
                 assert_eq!(name, String::from("last"));
-                assert!(relative_error(value, 1.0) < 1e-2);
+                assert!(relative_error(value.parse::<f64>().unwrap(), 1.0) < 1e-2);
             }
             Err(_) => assert!(false),
         }
@@ -89,7 +89,7 @@ mod tests {
         match calc.process(&expression) {
             Ok((name, value)) => {
                 assert_eq!(name, String::from("t"));
-                assert!(relative_error(value, 1.0) < 1e-2);
+                assert!(relative_error(value.parse::<f64>().unwrap(), 1.0) < 1e-2);
             }
             Err(_) => assert!(false),
         }
@@ -107,7 +107,7 @@ mod tests {
         match calc.process(&expression) {
             Ok((name, value)) => {
                 assert_eq!(name, String::from("last"));
-                assert!(relative_error(value, 1.0) < 1e-2);
+                assert!(relative_error(value.parse::<f64>().unwrap(), 1.0) < 1e-2);
             }
             Err(_) => assert!(false),
         }
@@ -123,7 +123,7 @@ mod tests {
         match calc.process(&expression) {
             Ok((name, value)) => {
                 assert_eq!(name, String::from("t"));
-                assert!(relative_error(value, 4.0) < 1e-2);
+                assert!(relative_error(value.parse::<f64>().unwrap(), 4.0) < 1e-2);
             }
             Err(_) => assert!(false),
         }
@@ -135,7 +135,7 @@ mod tests {
         match calc.process(&expression) {
             Ok((name, value)) => {
                 assert_eq!(name, String::from("last"));
-                assert!(relative_error(value, 1.0) < 1e-2);
+                assert!(relative_error(value.parse::<f64>().unwrap(), 1.0) < 1e-2);
             }
             Err(_) => assert!(false),
         }
