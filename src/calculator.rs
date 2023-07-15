@@ -3,6 +3,7 @@ use std::collections::HashMap;
 /// Process the string given by user
 pub struct Calculator {
     variables: HashMap<String, f64>, // map to store custom variable defined by user
+    expressions: HashMap<String, String>, // map to store expression defined by user
 }
 
 impl Calculator {
@@ -10,6 +11,7 @@ impl Calculator {
     pub fn new() -> Self {
         return Calculator {
             variables: HashMap::with_capacity(100),
+            expressions: HashMap::with_capacity(100),
         };
     }
 
@@ -25,24 +27,21 @@ impl Calculator {
                 let variable_expression: String =
                     String::from(expression.get((index + 1)..).unwrap());
 
-                match taz::evaluate_with_variables(&variable_expression, &self.variables) {
-                    Ok(value) => {
-                        self.variables.insert(name.clone(), value);
-                        return Ok((name, value));
-                    }
-                    Err(message) => Err(message),
-                }
+                let value: f64 =
+                    taz::evaluate_with_variables(&variable_expression, &self.variables)?;
+
+                self.variables.insert(name.clone(), value);
+
+                return Ok((name, value));
             }
             None => {
                 // Here we have raw expression
-                match taz::evaluate_with_variables(&expression, &self.variables) {
-                    Ok(value) => {
-                        let name: String = String::from("last");
-                        self.variables.insert(name.clone(), value);
-                        return Ok((name, value));
-                    }
-                    Err(message) => Err(message),
-                }
+                let name: String = String::from("last");
+                let value: f64 = taz::evaluate_with_variables(&expression, &self.variables)?;
+
+                self.variables.insert(name.clone(), value);
+
+                return Ok((name, value));
             }
         }
     }
