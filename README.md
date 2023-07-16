@@ -35,3 +35,7 @@ Tazui can work with simple expression and return result in variable named *last*
 Moreover, we can define variable with an expression. Tazui evaluate it and put result in this variable. Then we can reuse these variables in other expression.
 
 ![](doc/tazui-use-variables.png)
+
+We can also define reusable expression. Tazui evaluate it and put it name and current result in variables. Then we can modify variables and the expression is updated automaticaly.
+
+![](doc/tazui-use-expressions.png)
