@@ -3,7 +3,7 @@ use std::collections::HashMap;
 /// Process the string given by user
 pub struct Calculator {
     variables: HashMap<String, f64>, // map to store custom variable defined by user
-    expressions: HashMap<String, String>, // map to store expression defined by user
+    formulas: HashMap<String, String>, // map to store formulas defined by user
 }
 
 impl Calculator {
@@ -11,14 +11,14 @@ impl Calculator {
     pub fn new() -> Self {
         return Calculator {
             variables: HashMap::with_capacity(100),
-            expressions: HashMap::with_capacity(100),
+            formulas: HashMap::with_capacity(100),
         };
     }
 
     /// Update variables with new values of expressions
     fn update_variables_with_values_of_expressions(&mut self) -> Result<(), String> {
-        for (name, expression) in &self.expressions {
-            let value: f64 = taz::evaluate_with_variables(&expression, &self.variables)?;
+        for (name, expression) in &self.formulas {
+            let value: f64 = taz::evaluate(&expression, &self.variables)?;
             self.variables.insert(name.clone(), value);
         }
 
@@ -40,12 +40,14 @@ impl Calculator {
                     ));
                 }
 
-                // Here we define a variable or expression according to following format name = expression
+                // Here we define a variable or formula according to following format:
+                // - name = expression to define variable
+                // - name := expression to define an formula
                 let mut name: String = String::from(expression.get(0..index).unwrap().trim());
                 let sub_expression: String = String::from(expression.get((index + 1)..).unwrap());
 
                 if name.chars().last().unwrap() == ':' {
-                    // In this case we define an expression
+                    // In this case we define an formula
                     name.pop();
 
                     if name.is_empty() {
@@ -56,11 +58,10 @@ impl Calculator {
 
                     name = String::from(name.trim());
 
-                    self.expressions
-                        .insert(name.clone(), sub_expression.clone());
+                    self.formulas.insert(name.clone(), sub_expression.clone());
                 }
 
-                let value: f64 = taz::evaluate_with_variables(&sub_expression, &self.variables)?;
+                let value: f64 = taz::evaluate(&sub_expression, &self.variables)?;
 
                 self.variables.insert(name.clone(), value);
 
@@ -69,7 +70,7 @@ impl Calculator {
             None => {
                 // Here we have raw expression
                 let name: String = String::from("last");
-                let value: f64 = taz::evaluate_with_variables(&expression, &self.variables)?;
+                let value: f64 = taz::evaluate(&expression, &self.variables)?;
 
                 self.variables.insert(name.clone(), value);
 
@@ -127,7 +128,7 @@ mod tests {
         }
 
         assert_eq!(calc.variables.len(), 1);
-        assert_eq!(calc.expressions.len(), 0);
+        assert_eq!(calc.formulas.len(), 0);
     }
 
     #[test]
@@ -144,7 +145,7 @@ mod tests {
         }
 
         assert_eq!(calc.variables.len(), 1);
-        assert_eq!(calc.expressions.len(), 1);
+        assert_eq!(calc.formulas.len(), 1);
     }
 
     #[test]
@@ -169,7 +170,8 @@ mod tests {
     fn test_calculator_process_raw_expression_with_expression() {
         let mut calc: Calculator = Calculator::new();
         calc.variables.insert(String::from("t"), 5.0);
-        calc.expressions
+
+        calc.formulas
             .insert(String::from("s"), String::from("cos(t)^2 + sin(t)^2"));
 
         let expression: String = String::from("2.0 * s + 1.0");
@@ -183,7 +185,7 @@ mod tests {
         }
 
         assert_eq!(calc.variables.len(), 3);
-        assert_eq!(calc.expressions.len(), 1);
+        assert_eq!(calc.formulas.len(), 1);
     }
 
     #[test]
@@ -200,7 +202,7 @@ mod tests {
         }
 
         assert_eq!(calc.variables.len(), 1);
-        assert_eq!(calc.expressions.len(), 0);
+        assert_eq!(calc.formulas.len(), 0);
 
         expression = String::from("s := cos(t)^2 + sin(t)^2");
 
@@ -213,7 +215,7 @@ mod tests {
         }
 
         assert_eq!(calc.variables.len(), 2);
-        assert_eq!(calc.expressions.len(), 1);
+        assert_eq!(calc.formulas.len(), 1);
 
         expression = String::from("2.0 * s + 1.0");
 
@@ -226,6 +228,6 @@ mod tests {
         }
 
         assert_eq!(calc.variables.len(), 3);
-        assert_eq!(calc.expressions.len(), 1);
+        assert_eq!(calc.formulas.len(), 1);
     }
 }
