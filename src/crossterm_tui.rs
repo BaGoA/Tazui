@@ -1,11 +1,12 @@
 use super::tui::Tui;
+
 use std::io::{stdout, Error, Stdout, Write};
 
 use crossterm::{
-    cursor::{MoveLeft, MoveRight, MoveTo, MoveToColumn, MoveToNextLine},
+    cursor::{self, MoveLeft, MoveRight, MoveTo, MoveToColumn, MoveToNextLine},
     event::{read, Event, KeyCode, KeyEvent},
     execute,
-    terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
+    terminal::{self, disable_raw_mode, enable_raw_mode, Clear, ClearType, ScrollUp},
 };
 
 // TUI implementation using crossterm
@@ -24,6 +25,18 @@ impl CrosstermTui {
 
         let new_cursor_pos: usize = cursor_pos + self.start_of_line.len();
         execute!(self.stream, MoveToColumn(new_cursor_pos as u16))?;
+
+        return Ok(());
+    }
+
+    // Scroll up terminal if cursor is at the end
+    fn scroll_up(&mut self) -> Result<(), Error> {
+        let (_, nb_terminal_rows): (u16, u16) = terminal::size()?;
+        let (_, cursor_row): (u16, u16) = cursor::position()?;
+
+        if cursor_row + 1 >= nb_terminal_rows {
+            execute!(self.stream, ScrollUp(1))?;
+        }
 
         return Ok(());
     }
@@ -126,7 +139,9 @@ impl Tui for CrosstermTui {
                 }
                 KeyCode::Enter => {
                     // Terminate the entry
+                    self.scroll_up()?; // scroll up terminal if necessary
                     execute!(self.stream, MoveToNextLine(1))?;
+
                     break;
                 }
                 _ => continue,
@@ -147,8 +162,10 @@ impl Tui for CrosstermTui {
     // Display text on current line and go to next line
     fn display_text_with_new_line(&mut self, text: &String) -> Result<(), Error> {
         write!(self.stream, "{}", text)?;
-        execute!(self.stream, MoveToNextLine(1))?;
         self.stream.flush()?;
+
+        self.scroll_up()?; // scroll up terminal if necessary
+        execute!(self.stream, MoveToNextLine(1))?;
 
         return Ok(());
     }
