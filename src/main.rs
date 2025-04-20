@@ -1,5 +1,4 @@
 mod application;
-mod calculator;
 mod crossterm_tui;
 mod tui;
 
@@ -7,7 +6,7 @@ use application::Application;
 use crossterm_tui::CrosstermTui;
 
 fn main() {
-    let mut app: Application<CrosstermTui> = Application::<CrosstermTui>::new();
+    let mut app = Application::new(CrosstermTui::default(), taz::evaluate);
 
     if let Err(error) = app.init() {
         println!("{}\n", error);

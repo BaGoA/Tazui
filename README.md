@@ -36,6 +36,6 @@ Moreover, we can define variable with an expression. Tazui evaluate it and put r
 
 ![](doc/tazui-use-variables.png)
 
-We can also define reusable expression. Tazui evaluate it and put it name and current result in variables. Then we can modify variables and the expression is updated automaticaly.
+We can also define reusable function. Tazui parse it and store its representation. Then we can call this function in expression, variable or other function.
 
-![](doc/tazui-use-expressions.png)
+![](doc/tazui-use-functions.png)
