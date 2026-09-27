@@ -1,21 +1,20 @@
-use super::tui::Tui;
+use crate::tui::Tui;
 
 use std::io::Error;
 
 /// Tazui calculator application
-pub struct Application<TuiApp, Evaluator>
+pub struct Application<Evaluator>
 where
-    TuiApp: Tui,
     Evaluator: Fn(&str) -> Result<f64, String>,
 {
-    tui: TuiApp,                              // terminal user interface to interact with user
+    tui: Tui,                                 // terminal user interface to interact with user
     calculator: tazor::Calculator<Evaluator>, // calculator to process expressions given by user
     history: Vec<String>,                     // store previous expressions enter by user
 }
 
-impl<TuiApp: Tui, Evaluator: Fn(&str) -> Result<f64, String>> Application<TuiApp, Evaluator> {
+impl<Evaluator: Fn(&str) -> Result<f64, String>> Application<Evaluator> {
     /// Create a application
-    pub fn new(tui_app: TuiApp, evaluator: Evaluator) -> Self {
+    pub fn new(tui_app: Tui, evaluator: Evaluator) -> Self {
         return Application {
             tui: tui_app,
             calculator: tazor::Calculator::new(evaluator),

@@ -1,12 +1,15 @@
 mod application;
-mod crossterm_tui;
 mod tui;
 
 use application::Application;
-use crossterm_tui::CrosstermTui;
 
 fn main() {
-    let mut app = Application::new(CrosstermTui::default(), taz::evaluate);
+    // Evaluator using taz
+    let evaluator_fn = |expression: &str| {
+        taz::evaluate(expression).map_err(|taz_err: taz::error::Error| taz_err.message())
+    };
+
+    let mut app = Application::new(tui::Tui::default(), evaluator_fn);
 
     if let Err(error) = app.init() {
         println!("{}\n", error);
